@@ -1,2 +1,2 @@
 # Matrix-Class
-Competency test for Boost.uBLAS
+This repository contains the competency test for Boost.uBLAS.
