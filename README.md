@@ -3,6 +3,6 @@
 
 ### completed features
 1. Basic header file
-  *. Matrix class definition
-  +. plus operator
-  *. multiply operator 
+  * Matrix class definition
+  * plus operator
+  * multiply operator 
