@@ -8,6 +8,7 @@
 
 #include <vector>
 #include <iostream>
+#include <cassert>
 
 template< class T>
 class Matrix;
@@ -31,12 +32,11 @@ class MatrixMult {
 		const Matrix<T> &mat2;
 		MatrixMult(const Matrix<T> &mat1, const Matrix<T> &mat2) : mat1(mat1), mat2(mat2) {}	
 
-	// to be changed.
 	T operator()(size_t idx1, size_t idx2) const{
-		T sum;
-		for (int i=0;i<mat1.r_size;i++) {
+		T sum = 0;
+		for (int i=0;i<mat1.c_size;i++) {
 			sum += mat1.mat[idx1][i]*mat2.mat[i][idx2];
-		}		
+		}
 		return sum; 
 	}
 };
@@ -58,7 +58,7 @@ class Matrix {
  	}
  	
  	//matrix defn with size and initia value
- 	Matrix(std::size_t r, std::size_t c, double val) : r_size(r), c_size(c) {
+ 	Matrix(std::size_t r, std::size_t c, T val) : r_size(r), c_size(c) {
  		mat.resize(r_size);
  		for(std::size_t i = 0; i<r_size; i++) {
  			mat[i].resize(c_size);
@@ -85,7 +85,7 @@ class Matrix {
 
 	inline Matrix &operator=(const MatrixAdd<T> ans) {
 		r_size = ans.mat1.r_size;
-		c_size = ans.mat2.c_size;
+		c_size = ans.mat1.c_size;
 
 		for(int i = 0; i<r_size; i++) {
 			for(int j = 0; j<c_size; j++) {
@@ -95,14 +95,15 @@ class Matrix {
 		return *this;
 	}
 
-	//chnages to be done
-	inline Matrix &operator=(const MatrixMult<T> ans) {
-		r_size = ans.mat1.r_size;
-		c_size = ans.mat2.c_size;
 
-		for(int i = 0; i<r_size; i++) {
-			for(int j = 0; j<c_size; j++) {
-				mat[i][j] = ans.mat1.mat[i][j] + ans.mat2.mat[i][j];
+	inline Matrix &operator=(const MatrixMult<T> ans) {
+		//basic O(n^3) implementation of matrix multiplication
+		for(int i = 0; i<ans.mat1.r_size; i++) {
+			for(int j = 0; j<ans.mat2.c_size; j++) {
+				mat[i][j] = 0;
+				for (int k = 0;k<ans.mat1.c_size;k++) {
+					mat[i][j] += ans.mat1.mat[i][k] + ans.mat2.mat[k][j];
+				}
 			}
 		} 
 		return *this;
@@ -112,13 +113,19 @@ class Matrix {
 
 template< class T> 
 inline MatrixAdd<T> operator+(const Matrix<T> &mat1, const Matrix<T> &mat2) {
+	//checking if addition is possible
+	assert(mat1.r_size == mat2.r_size && mat1.c_size == mat2.c_size);
+	
 	return MatrixAdd<T>(mat1,mat2);
 }
 
 template< class T> 
 inline MatrixMult<T> operator*(const Matrix<T> &mat1, const Matrix<T> &mat2) {
-	if (mat1.r_size == mat2.c_size) return MatrixMult<T>(mat1,mat2);
-	else std::cout<<"Multiplication is not posiible"<<std::endl;
+	//checking if multiplication is possible
+	assert(mat1.c_size == mat2.r_size); 
+
+	return MatrixMult<T>(mat1,mat2);
+	
 }
 
 

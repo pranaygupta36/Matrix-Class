@@ -14,7 +14,7 @@
 using namespace std;
 
 int main(void) {
-	Matrix<int> b(2,1,3);
+	Matrix<int> b(2,2,3);
 	Matrix<int> c(2,1,1);
 
 	// vector <vector<int> > temp;
@@ -30,6 +30,6 @@ int main(void) {
 	//cout<<"Yo"<<endl;
 	const int i = 0;
 	const int j = 1;
-	//cout<<(a)(0,0)<<endl;
+	cout<<(b*c)(0,0)<<endl;
 	return 0; 
 }
