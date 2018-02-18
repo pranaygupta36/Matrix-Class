@@ -80,6 +80,20 @@ class Matrix : public MatExp<Matrix<T> > {
 				}
 			}
 		}
+
+		template<typename E>
+		Matrix operator = (MatExp<E> const& matexp) {
+			size_t r_size = matexp.r_size();
+			size_t c_size = matexp.c_size();
+			mat.resize(r_size);
+			for(size_t i = 0; i<r_size; i++) {
+				mat[i].resize(c_size);
+				for(size_t j = 0; j<c_size; j++) {
+					mat[i][j] = matexp(i, j);
+				}
+			}
+			return *(this);
+		}
 };
 
 template<typename E1, typename E2> 	
@@ -94,11 +108,7 @@ public:
 	double operator()(size_t i, size_t j) const{
 			return _u(i, j) + _v(i, j);
 	}
-
-	// std::vector<double> operator[](size_t i) {
-	// 	return 
-	// }  
-		
+	
 	size_t r_size = _u.r_size;
 	size_t c_size = _u.c_size;
 };
