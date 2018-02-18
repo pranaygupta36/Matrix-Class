@@ -3,13 +3,9 @@
 //   IIIT HYD   //
 //////////////////
 
-// #ifndef MATRIX_H
-// #define MATRIX_H
-
 #include <vector>
 #include <iostream>
-//#include "matrix.h"
-#include "expression_templates.h"
+#include "../includes/expression_templates.h"
 #include <cassert>
 
 using namespace std;
@@ -21,8 +17,8 @@ int main(void) {
 
 	
 	Matrix<int> a;
-	// a = 0;
 	a = (b+c+d);
-	cout<<a(0,0)<<endl;
+
+	cout<<h(0,0)<<endl;
 	return 0; 
 }

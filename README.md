@@ -6,10 +6,12 @@
 2. expression_templates.h
   * addition operator done
   * a+b+c handled
+  * multiplication operator done
+  * a*b*c handled
 
 3. matrix.h
   * addition operator
   * multiplication operator
   * a+b+c not handled
 
-4. Also an example file for expression_templates.h is also present showing how the addition functionality is handled.
+4. Also an example file for expression_templates.h is also present showing both the addition and multiplication functionality.
