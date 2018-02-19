@@ -16,8 +16,8 @@ int main(void) {
 	Matrix<int> c(3,3,1);
 	
 	Matrix<int> d;
-	h = (e*f*g);
+	d = (a*b*c);
 
-	cout<<h(0,0)<<endl;
+	cout<<d.r_size()<<endl;
 	return 0; 
 }

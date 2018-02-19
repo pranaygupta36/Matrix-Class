@@ -15,10 +15,10 @@ int main(void) {
 	Matrix<int> c(2,2,1);
 	Matrix<int> d(2,2,1);
 
-	
+	cout<<b.r_size()<<endl;
 	Matrix<int> a;
 	a = (b+c+d);
 
-	cout<<h(0,0)<<endl;
+	cout<<a.r_size()<<endl;
 	return 0; 
 }

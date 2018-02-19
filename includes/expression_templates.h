@@ -18,10 +18,10 @@ class MatExp {
 			return static_cast<E const&>(*this)(i, j);
 		} 
 		size_t r_size() const {
-			return static_cast<E const&>(*this).r_size;
+			return static_cast<E const&>(*this).r_size();
 		}
 		size_t c_size() const {
-			return static_cast<E const&>(*this).c_size;
+			return static_cast<E const&>(*this).c_size();
 		}
 
 		operator E& () { return static_cast<E&>(*this); }
@@ -32,11 +32,12 @@ class MatExp {
 template<typename T>
 class Matrix : public MatExp<Matrix<T> > {
 	
+	size_t row_size;
+	size_t col_size;
+
 	public:
 		std::vector<std::vector<T> > mat;
-		size_t r_size;
-		size_t c_size;
-
+		
 		T operator()(size_t i, size_t j) const{ 
 			return mat[i][j];
 		}
@@ -45,14 +46,32 @@ class Matrix : public MatExp<Matrix<T> > {
 			return mat[i][j];
 		}
 
+		size_t r_size() const {
+			return row_size;
+		}
+
+		size_t c_size() const {
+			return col_size;
+		}
+
+		void setR_size(size_t rowsize) {
+			row_size = rowsize;
+		}
+
+		void setC_size(size_t colsize) {
+			col_size = colsize;
+		}
+		
 		std::vector<T> operator[](size_t i) {
 			return mat[i];
 		}
 
-		Matrix(void) {}
+		Matrix(void) {
+			//r_size = c_size = 0;
+		}
  	
  		// matrix defn with size
-	 	Matrix(std::size_t r, std::size_t c) : r_size(r), c_size(c) {
+	 	Matrix(std::size_t r, std::size_t c) : row_size(r), col_size(c) {
 			mat.resize(r_size);
 	 		for(std::size_t i = 0; i<r_size; i++) {
 	 			mat[i].resize(c_size);
@@ -60,24 +79,24 @@ class Matrix : public MatExp<Matrix<T> > {
 	 	}
 	 	
 	 	//matrix defn with size and initia value
-	 	Matrix(std::size_t r, std::size_t c, T val) : r_size(r), c_size(c) {
-	 		mat.resize(r_size);
-	 		for(std::size_t i = 0; i<r_size; i++) {
-	 			mat[i].resize(c_size);
-	 			for (std::size_t j = 0; j<c_size; j++) {
+	 	Matrix(std::size_t r, std::size_t c, T val) : row_size(r), col_size(c) {
+	 		mat.resize(row_size);
+	 		for(std::size_t i = 0; i<row_size; i++) {
+	 			mat[i].resize(col_size);
+	 			for (std::size_t j = 0; j<col_size; j++) {
 	 				mat[i][j] = val;
 	 			}
 	 		}
 		}
 
-		Matrix(std::vector< std::vector<T> > mat) : r_size(mat.r_size), c_size(mat.c_size), mat(mat) {}
+		Matrix(std::vector< std::vector<T> > mat) : row_size(mat.r_size), col_size(mat.c_size), mat(mat) {}
 
 		template<typename E>
-		Matrix(MatExp<E> const& matexp) : r_size(matexp.r_size()), c_size(matexp.c_size()) {
-			mat.resize(r_size);
-			for(size_t i = 0; i<r_size; i++) {
-				mat[i].resize(c_size);
-				for(size_t j = 0; j<c_size; j++) {
+		Matrix(MatExp<E> const& matexp) : row_size(matexp.r_size()), col_size(matexp.c_size()) {
+			mat.resize(row_size);
+			for(size_t i = 0; i<row_size; i++) {
+				mat[i].resize(col_size);
+				for(size_t j = 0; j<col_size; j++) {
 					mat[i][j] = matexp(i, j);
 				}
 			}
@@ -85,12 +104,15 @@ class Matrix : public MatExp<Matrix<T> > {
 
 		template<typename E>
 		Matrix operator = (MatExp<E> const& matexp) {
-			size_t r_size = matexp.r_size();
-			size_t c_size = matexp.c_size();
-			mat.resize(r_size);
-			for(size_t i = 0; i<r_size; i++) {
-				mat[i].resize(c_size);
-				for(size_t j = 0; j<c_size; j++) {
+			size_t rsize = matexp.r_size();
+			size_t csize = matexp.c_size();
+			this->setC_size(csize);
+			this->setR_size(rsize);
+			mat.resize(rsize);
+			//std::cout<<"r_size = "<<r_size<<std::endl;
+			for(size_t i = 0; i<rsize; i++) {
+				mat[i].resize(csize);
+				for(size_t j = 0; j<csize; j++) {
 					mat[i][j] = matexp(i, j);
 				}
 			}
@@ -105,15 +127,21 @@ class MatSum : public MatExp<MatSum<E1, E2> > {
 	E2 const& _v;
 public:
 	MatSum(E1 const& u, E2 const& v) : _u(u) , _v(v) {
-		assert(u.r_size == v.r_size && u.c_size == v.c_size);
+		assert(u.r_size() == v.r_size() && u.c_size() == v.c_size());
 	} 
 	
 	double operator()(size_t i, size_t j) const{
 			return _u(i, j) + _v(i, j);
 	}
 	
-	size_t r_size = _u.r_size;
-	size_t c_size = _u.c_size;
+	size_t r_size() const{ 
+		return _u.r_size();
+	}
+
+	size_t c_size() const{ 
+		return _u.c_size();
+	}	
+	//size_t c_size = _u.c_size;
 };
 
 //matrix mult class definition
@@ -123,19 +151,26 @@ class MatMult : public MatExp<MatMult<E1, E2> > {
 	E2 const& _v;
 public:
 	MatMult(E1 const& u, E2 const& v) : _u(u) , _v(v) {
-		assert(u.c_size == v.r_size);
+		assert(u.c_size() == v.r_size());
 	} 
 	
 	double operator()(size_t idx1, size_t idx2) const{
 		double sum = 0;
-		for (int i = 0; i<_u.c_size; i++) {
+		for (int i = 0; i<_u.c_size(); i++) {
 			sum += _u(idx1, i)*_v(i, idx2);
 		}
 		return sum; 
 	}
 	
-	size_t r_size = _u.r_size;
-	size_t c_size = _v.c_size;
+	size_t r_size() const{ 
+		return _u.r_size();
+	}
+
+	size_t c_size() const{ 
+		return _v.c_size();
+	}
+	//size_t r_size = _u.r_size;
+	//size_t c_size = _v.c_size;
 };
 
 
