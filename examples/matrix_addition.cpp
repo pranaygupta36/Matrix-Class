@@ -16,9 +16,9 @@ int main(void) {
 	Matrix<int> d(2,2,1);
 
 	cout<<b.r_size()<<endl;
-	Matrix<int> a;
+	Matrix<int> a(2,2);
 	a = (b+c+d);
 
-	cout<<a.r_size()<<endl;
+	cout<<a(1,1)<<endl;
 	return 0; 
 }

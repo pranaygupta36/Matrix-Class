@@ -9,7 +9,7 @@
 #include <vector>
 #include <iostream>
 #include <cassert>
-
+#include <typeinfo>
 //expression class definition
 template<typename E>
 class MatExp {
@@ -62,19 +62,23 @@ class Matrix : public MatExp<Matrix<T> > {
 			col_size = colsize;
 		}
 		
+		void setVal(size_t i, size_t j, T val) {
+			assert(i <= row_size-1 && i>=0);
+			assert(j <= col_size-1 && j>=0);
+			mat[i][j] = val;
+		}
+
 		std::vector<T> operator[](size_t i) {
 			return mat[i];
 		}
 
-		Matrix(void) {
-			//r_size = c_size = 0;
-		}
+		Matrix(void) : row_size(0), col_size(0) {}
  	
  		// matrix defn with size
 	 	Matrix(std::size_t r, std::size_t c) : row_size(r), col_size(c) {
-			mat.resize(r_size);
-	 		for(std::size_t i = 0; i<r_size; i++) {
-	 			mat[i].resize(c_size);
+			mat.resize(row_size);
+	 		for(std::size_t i = 0; i<row_size; i++) {
+	 			mat[i].resize(col_size);
 	 		}	
 	 	}
 	 	
@@ -106,12 +110,11 @@ class Matrix : public MatExp<Matrix<T> > {
 		Matrix operator = (MatExp<E> const& matexp) {
 			size_t rsize = matexp.r_size();
 			size_t csize = matexp.c_size();
-			this->setC_size(csize);
-			this->setR_size(rsize);
-			mat.resize(rsize);
-			//std::cout<<"r_size = "<<r_size<<std::endl;
+			
+			assert(rsize == this->r_size());
+			assert(csize == this->c_size());
+			
 			for(size_t i = 0; i<rsize; i++) {
-				mat[i].resize(csize);
 				for(size_t j = 0; j<csize; j++) {
 					mat[i][j] = matexp(i, j);
 				}
@@ -125,13 +128,15 @@ template<typename E1, typename E2>
 class MatSum : public MatExp<MatSum<E1, E2> > {
 	E1 const& _u;
 	E2 const& _v;
+
 public:
 	MatSum(E1 const& u, E2 const& v) : _u(u) , _v(v) {
 		assert(u.r_size() == v.r_size() && u.c_size() == v.c_size());
 	} 
 	
 	double operator()(size_t i, size_t j) const{
-			return _u(i, j) + _v(i, j);
+		//std::cout<<"hello"<<std::endl;
+		return _u(i, j) + _v(i, j);
 	}
 	
 	size_t r_size() const{ 
@@ -141,7 +146,7 @@ public:
 	size_t c_size() const{ 
 		return _u.c_size();
 	}	
-	//size_t c_size = _u.c_size;
+
 };
 
 //matrix mult class definition
@@ -149,6 +154,7 @@ template<typename E1, typename E2>
 class MatMult : public MatExp<MatMult<E1, E2> > {
 	E1 const& _u;
 	E2 const& _v;
+
 public:
 	MatMult(E1 const& u, E2 const& v) : _u(u) , _v(v) {
 		assert(u.c_size() == v.r_size());
@@ -169,8 +175,7 @@ public:
 	size_t c_size() const{ 
 		return _v.c_size();
 	}
-	//size_t r_size = _u.r_size;
-	//size_t c_size = _v.c_size;
+
 };
 
 
