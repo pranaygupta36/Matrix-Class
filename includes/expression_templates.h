@@ -11,21 +11,66 @@
 #include <cassert>
 #include <typeinfo>
 //expression class definition
+
 template<typename E>
 class MatExp {
 	public:
-		double operator()(size_t i, size_t j) const{
-			return static_cast<E const&>(*this)(i, j);
-		} 
-		size_t r_size() const {
-			return static_cast<E const&>(*this).r_size();
-		}
-		size_t c_size() const {
-			return static_cast<E const&>(*this).c_size();
-		}
-
+		
 		operator E& () { return static_cast<E&>(*this); }
 		operator const E& () const { return static_cast<E&>(*this); }
+};
+
+template<typename E1, typename E2> 	
+class MatSum : public MatExp<MatSum<E1, E2> > {
+	E1 const& _u;
+	E2 const& _v;
+
+public:
+	MatSum(E1 const& u, E2 const& v) : _u(u) , _v(v) {
+		assert(u.r_size() == v.r_size() && u.c_size() == v.c_size());
+	} 
+	
+	typeof(_u(0,0)) operator()(size_t i, size_t j) const{
+		return _u(i, j) + _v(i, j);
+	}
+	
+	size_t r_size() const{ 
+		return _u.r_size();
+	}
+
+	size_t c_size() const{ 
+		return _u.c_size();
+	}	
+
+};
+
+//matrix mult class definition
+template<typename E1, typename E2> 	
+class MatMult : public MatExp<MatMult<E1, E2> > {
+	E1 const& _u;
+	E2 const& _v;
+
+public:
+	MatMult(E1 const& u, E2 const& v) : _u(u) , _v(v) {
+		assert(u.c_size() == v.r_size());
+	} 
+	
+	typeof(_u(0, 0)) operator()(size_t idx1, size_t idx2) const{
+		typeof(_u(0, 0)) sum = 0;
+		for (int i = 0; i<_u.c_size(); i++) {
+			sum += _u(idx1, i)*_v(i, idx2);
+		}
+		return sum; 
+	}
+	
+	size_t r_size() const{ 
+		return _u.r_size();
+	}
+
+	size_t c_size() const{ 
+		return _v.c_size();
+	}
+
 };
 
 //matrix class definition
@@ -106,77 +151,40 @@ class Matrix : public MatExp<Matrix<T> > {
 			}
 		}
 
-		template<typename E>
-		Matrix operator = (MatExp<E> const& matexp) {
-			size_t rsize = matexp.r_size();
-			size_t csize = matexp.c_size();
+		template<typename E1, typename E2>
+		Matrix operator = (MatSum<E1, E2> const& matadd) {
+			size_t rsize = matadd.r_size();
+			size_t csize = matadd.c_size();
 			
 			assert(rsize == this->r_size());
 			assert(csize == this->c_size());
 			
 			for(size_t i = 0; i<rsize; i++) {
 				for(size_t j = 0; j<csize; j++) {
-					mat[i][j] = matexp(i, j);
+					mat[i][j] = (T) matadd(i, j);
+				}
+			}
+			return *(this);
+		}
+
+		template<typename E1, typename E2>
+		Matrix operator = (MatMult<E1, E2> const& matmult) {
+			size_t rsize = matmult.r_size();
+			size_t csize = matmult.c_size();
+			
+			assert(rsize == this->r_size());
+			assert(csize == this->c_size());
+			
+			for(size_t i = 0; i<rsize; i++) {
+				for(size_t j = 0; j<csize; j++) {
+					mat[i][j] = (T) matmult(i, j);
 				}
 			}
 			return *(this);
 		}
 };
 
-// matrix sum class definition
-template<typename E1, typename E2> 	
-class MatSum : public MatExp<MatSum<E1, E2> > {
-	E1 const& _u;
-	E2 const& _v;
-
-public:
-	MatSum(E1 const& u, E2 const& v) : _u(u) , _v(v) {
-		assert(u.r_size() == v.r_size() && u.c_size() == v.c_size());
-	} 
-	
-	double operator()(size_t i, size_t j) const{
-		//std::cout<<"hello"<<std::endl;
-		return _u(i, j) + _v(i, j);
-	}
-	
-	size_t r_size() const{ 
-		return _u.r_size();
-	}
-
-	size_t c_size() const{ 
-		return _u.c_size();
-	}	
-
-};
-
-//matrix mult class definition
-template<typename E1, typename E2> 	
-class MatMult : public MatExp<MatMult<E1, E2> > {
-	E1 const& _u;
-	E2 const& _v;
-
-public:
-	MatMult(E1 const& u, E2 const& v) : _u(u) , _v(v) {
-		assert(u.c_size() == v.r_size());
-	} 
-	
-	double operator()(size_t idx1, size_t idx2) const{
-		double sum = 0;
-		for (int i = 0; i<_u.c_size(); i++) {
-			sum += _u(idx1, i)*_v(i, idx2);
-		}
-		return sum; 
-	}
-	
-	size_t r_size() const{ 
-		return _u.r_size();
-	}
-
-	size_t c_size() const{ 
-		return _v.c_size();
-	}
-
-};
+//matrix sum class definition
 
 
 template <typename E1, typename E2>

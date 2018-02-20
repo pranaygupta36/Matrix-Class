@@ -16,4 +16,6 @@
 
 4. Also an example file for expression_templates.h is also present showing both the addition and multiplication functionality.
 
-5. Tests for matrix addition and multiplication added.(complex data type not working).
+5. Tests for matrix addition and multiplication added.
+
+6. All data types now handled in both addition and multiplication. 

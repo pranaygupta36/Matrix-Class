@@ -166,29 +166,29 @@ BOOST_AUTO_TEST_CASE(Matrix_addition_float) {
 	}
 }
 
-// BOOST_AUTO_TEST_CASE (Matrix_addition_complex) {
+BOOST_AUTO_TEST_CASE (Matrix_addition_complex) {
 
-// 	Matrix<std::complex<double> > TestMatrix1(1, 2), TestMatrix2(1, 2), TestMatrix3(1, 2), TestMatrix4(1, 2);
+	Matrix<std::complex<double> > TestMatrix1(1, 2), TestMatrix2(1, 2), TestMatrix3(1, 2), TestMatrix4(1, 2);
 	
-// 	TestMatrix1.setVal(0, 0, std::complex<double>(1.2, 1));
-// 	TestMatrix1.setVal(0, 1, std::complex<double>(1.3, 1));
+	TestMatrix1.setVal(0, 0, std::complex<double>(1.2, 1));
+	TestMatrix1.setVal(0, 1, std::complex<double>(1.3, 1));
 	
-// 	TestMatrix2.setVal(0, 0, std::complex<double>(9.2, -1));
-// 	TestMatrix2.setVal(0, 1, std::complex<double>(1.1, 2.9));
+	TestMatrix2.setVal(0, 0, std::complex<double>(9.2, -1));
+	TestMatrix2.setVal(0, 1, std::complex<double>(1.1, 2.9));
 
-// 	TestMatrix3.setVal(0, 0, std::complex<double>(10.4, 0));
-// 	TestMatrix3.setVal(0, 1, std::complex<double>(2.4, 4.9));
+	TestMatrix3.setVal(0, 0, std::complex<double>(10.4, 0));
+	TestMatrix3.setVal(0, 1, std::complex<double>(2.4, 3.9));
 
-// 	TestMatrix4 = TestMatrix1 + TestMatrix2;
+	TestMatrix4 = TestMatrix1 + TestMatrix2;
 
-// 	for(unsigned int i = 0; i < TestMatrix4.r_size(); i++) {
-// 		for(unsigned int j = 0; j < TestMatrix4.c_size(); j++) {
-// 			//taking a precision error of 1e-13
-// 			BOOST_CHECK(fabs(TestMatrix4(i, j).real() - TestMatrix3(i, j).real()) <= 1e-13);
-// 			BOOST_CHECK(fabs(TestMatrix4(i, j).imag() - TestMatrix3(i, j).imag()) <= 1e-13);
-// 		}
-// 	}	
-// }
+	for(unsigned int i = 0; i < TestMatrix4.r_size(); i++) {
+		for(unsigned int j = 0; j < TestMatrix4.c_size(); j++) {
+			//taking a precision error of 1e-13
+			BOOST_CHECK(fabs(TestMatrix4(i, j).real() - TestMatrix3(i, j).real()) <= 1e-13);
+			BOOST_CHECK(fabs(TestMatrix4(i, j).imag() - TestMatrix3(i, j).imag()) <= 1e-13);
+		}
+	}	
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -225,4 +225,32 @@ BOOST_AUTO_TEST_CASE(Matrix_multiplication_int) {
 	}
 }
 
+BOOST_AUTO_TEST_CASE (Matrix_Multiplication_complex) {
+
+	Matrix< std::complex<unsigned int > > TestMatrix1(2, 2), TestMatrix2(2, 2), TestMatrix3(2, 2), TestMatrix4(2, 2);
+	TestMatrix1.setVal(0, 0, std::complex<int>(1, 1));
+	TestMatrix1.setVal(0, 1, std::complex<int>(2, 3));
+	TestMatrix1.setVal(1, 0, std::complex<int>(1, -1));
+	TestMatrix1.setVal(1, 1, std::complex<int>(2, -4));
+	
+	TestMatrix2.setVal(0, 0, std::complex<int>(0, 1));
+	TestMatrix2.setVal(0, 1, std::complex<int>(0, -7));
+	TestMatrix2.setVal(1, 0, std::complex<int>(0, 8));
+	TestMatrix2.setVal(1, 1, std::complex<int>(9, 3));
+
+	TestMatrix3.setVal(0, 0, std::complex<int>(-25, 17));
+	TestMatrix3.setVal(0, 1, std::complex<int>(16, 26));
+	TestMatrix3.setVal(1, 0, std::complex<int>(33, 17));
+	TestMatrix3.setVal(1, 1, std::complex<int>(23, -37));
+
+	
+	TestMatrix4 = TestMatrix1 * TestMatrix2;
+
+	for(unsigned int i = 0; i < TestMatrix4.r_size(); i++) {
+		for(unsigned int j = 0; j < TestMatrix4.c_size(); j++) {
+			//computed value check
+			BOOST_CHECK(TestMatrix4(i, j) == TestMatrix3(i, j));
+		}
+	}
+}
 BOOST_AUTO_TEST_SUITE_END()
