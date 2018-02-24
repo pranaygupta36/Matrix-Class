@@ -2,20 +2,21 @@
 ## This repository contains the competency test for Boost.uBLAS.
 
 ### completed features
-1. Basic header file using C++templates called matrix.h and one file using expression templates called expression_templates.h.
+1. Basic header file using C++templates called matrix.h and one file using **expression templates** called *expression_templates.h*.
 2. expression_templates.h
-  * addition operator done
+  * **addition operator** done
   * a+b+c handled
-  * multiplication operator done
+  * **multiplication operator** done
   * a*b*c handled
+  * functionality added for **+=**
 
 3. matrix.h
   * addition operator
   * multiplication operator
   * a+b+c not handled
 
-4. Also an example file for expression_templates.h is also present showing both the addition and multiplication functionality.
+4. Also **example files** for expression_templates.h is also present showing both the addition and multiplication functionality and +=.
 
-5. Tests for matrix addition and multiplication added.
+5. **Tests** for matrix addition and multiplication added.
 
 6. All data types now handled in both addition and multiplication. 

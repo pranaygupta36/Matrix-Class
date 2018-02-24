@@ -16,8 +16,8 @@ template<typename E>
 class MatExp {
 	public:
 		
-		operator E& () { return static_cast<E&>(*this); }
-		operator const E& () const { return static_cast<E&>(*this); }
+		inline E &self(void) { return static_cast<E*>(this); }
+		inline const E &self(void) const { return *static_cast<const E*>(this); }
 };
 
 template<typename E1, typename E2> 	
@@ -140,13 +140,24 @@ class Matrix : public MatExp<Matrix<T> > {
 
 		Matrix(std::vector< std::vector<T> > mat) : row_size(mat.r_size), col_size(mat.c_size), mat(mat) {}
 
-		template<typename E>
-		Matrix(MatExp<E> const& matexp) : row_size(matexp.r_size()), col_size(matexp.c_size()) {
+		template<typename E1, typename E2>
+		Matrix(MatSum<E1, E2> const& matsum) : row_size(matsum.r_size()), col_size(matsum.c_size()) {
 			mat.resize(row_size);
 			for(size_t i = 0; i<row_size; i++) {
 				mat[i].resize(col_size);
 				for(size_t j = 0; j<col_size; j++) {
-					mat[i][j] = matexp(i, j);
+					mat[i][j] = matsum(i, j);
+				}
+			}
+		}
+
+		template<typename E1, typename E2>
+		Matrix(MatMult<E1, E2> const& matmult) : row_size(matmult.r_size()), col_size(matmult.c_size()) {
+			mat.resize(row_size);
+			for(size_t i = 0; i<row_size; i++) {
+				mat[i].resize(col_size);
+				for(size_t j = 0; j<col_size; j++) {
+					mat[i][j] = matmult(i, j);
 				}
 			}
 		}
@@ -182,10 +193,23 @@ class Matrix : public MatExp<Matrix<T> > {
 			}
 			return *(this);
 		}
+
+		template<typename E1>
+		Matrix operator += (MatExp<E1> const& matadd) {
+			
+			const E1& x = matadd.self();
+			assert(x.r_size() == this->r_size());
+			assert(x.c_size() == this->c_size());
+			
+			for(size_t i = 0; i<this->r_size() ;i++) {
+				for(size_t j = 0; j<this->c_size() ;j++) {
+					mat[i][j] += x.mat[i][j];
+				} 
+			}
+			return *(this);
+		}
+
 };
-
-//matrix sum class definition
-
 
 template <typename E1, typename E2>
 MatSum<E1,E2> const operator+(E1 const& u, E2 const& v) {
